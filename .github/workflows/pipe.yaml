@@ -1,0 +1,31 @@
+name: Piper
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  piper:
+    runs-on: windows-2019
+    name: Pipe Data
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    - name: Install .NET SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.201
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build Piper
+      run: dotnet publish .\piper\piper.csproj -o .\publish
+
+    - name: Build Echo
+      run: msbuild .\echo\echo.vcxproj /p:OutDir=..\publish\
+
+    - name: Run Piper
+      run: .\publish\piper.exe .\publish\echo.exe
